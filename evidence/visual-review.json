@@ -1,0 +1,20 @@
+{
+  "pbwSHA256": "4c656f5feaab9e369eb2acad40b5b1e8dd151ebc7af41e6d8dc106c5b932c1c4",
+  "platforms": [
+    "basalt",
+    "chalk",
+    "diorite",
+    "emery",
+    "flint",
+    "gabbro"
+  ],
+  "captureNames": [
+    "hero",
+    "quarter",
+    "evening",
+    "noon-rollover",
+    "midnight-rollover"
+  ],
+  "result": "Inspected native captures: three circular gauges, readable H/M/S and exact values, filled/empty hierarchy, fitting round and rectangular layouts, correct noon and midnight.",
+  "limits": "Emulator captures; physical readability and battery life untested."
+}

@@ -1,0 +1,72 @@
+{
+  "platform": "gabbro",
+  "pbwSHA256": "4c656f5feaab9e369eb2acad40b5b1e8dd151ebc7af41e6d8dc106c5b932c1c4",
+  "capturedAt": "2026-09-06T07:13:04.200617+00:00",
+  "secondsChanged": true,
+  "naturalNoonRollover": true,
+  "naturalMidnightRollover": true,
+  "cadenceFrames": {
+    "idle": [
+      19,
+      20,
+      21
+    ],
+    "tap": [
+      22,
+      29,
+      37,
+      45
+    ],
+    "settled": [
+      74,
+      75,
+      76
+    ]
+  },
+  "frames": [
+    "evidence/gabbro-hero.png",
+    "evidence/gabbro-later.png",
+    "evidence/gabbro-noon.png",
+    "evidence/gabbro-quarter.png",
+    "evidence/gabbro-evening.png",
+    "evidence/gabbro-before-noon.png",
+    "evidence/gabbro-noon-rollover.png",
+    "evidence/gabbro-before-midnight.png",
+    "evidence/gabbro-midnight-rollover.png",
+    "evidence/gabbro-cadence.png"
+  ],
+  "logs": [
+    "Petrichor time=07:12:33.777 ripples=4 ms=7 heap=125244 frames=1",
+    "Petrichor time=07:12:34.106 ripples=4 ms=5 heap=125324 frames=4",
+    "Petrichor time=23:21:31.107 ripples=4 ms=6 heap=125324 frames=5",
+    "Petrichor time=23:21:32.106 ripples=4 ms=5 heap=125324 frames=6",
+    "Petrichor time=23:21:33.106 ripples=4 ms=5 heap=125324 frames=7",
+    "Petrichor time=12:00:00.107 ripples=6 ms=8 heap=125324 frames=8",
+    "Petrichor time=03:15:45.106 ripples=4 ms=5 heap=125324 frames=9",
+    "Petrichor time=18:30:30.106 ripples=4 ms=5 heap=125324 frames=10",
+    "Petrichor time=11:59:58.106 ripples=4 ms=5 heap=125324 frames=11",
+    "Petrichor time=11:59:59.106 ripples=4 ms=6 heap=125324 frames=12",
+    "Petrichor time=12:00:00.106 ripples=6 ms=6 heap=125324 frames=13",
+    "Petrichor time=23:59:58.107 ripples=4 ms=5 heap=125324 frames=14",
+    "Petrichor time=23:59:59.106 ripples=4 ms=6 heap=125324 frames=15",
+    "Petrichor time=00:00:00.106 ripples=6 ms=5 heap=125324 frames=16",
+    "Petrichor time=11:24:30.106 ripples=4 ms=5 heap=125324 frames=17",
+    "Petrichor time=11:24:31.106 ripples=4 ms=6 heap=125324 frames=18",
+    "Petrichor time=11:24:32.106 ripples=4 ms=5 heap=125324 frames=19",
+    "Petrichor time=11:24:33.106 ripples=4 ms=5 heap=125324 frames=20",
+    "Petrichor time=11:24:34.106 ripples=4 ms=5 heap=125324 frames=21",
+    "Petrichor time=11:24:35.654 ripples=3 ms=5 heap=125324 frames=22",
+    "Petrichor time=11:24:36.543 ripples=3 ms=5 heap=125324 frames=29",
+    "Petrichor time=11:24:37.560 ripples=3 ms=6 heap=125324 frames=37",
+    "Petrichor time=11:24:38.580 ripples=3 ms=5 heap=125324 frames=45",
+    "Petrichor time=11:24:39.471 ripples=3 ms=6 heap=125324 frames=52",
+    "Petrichor time=11:24:40.491 ripples=3 ms=6 heap=125324 frames=60",
+    "Petrichor time=11:24:41.506 ripples=3 ms=5 heap=125324 frames=68",
+    "Petrichor time=11:24:42.106 ripples=4 ms=5 heap=125324 frames=72",
+    "Petrichor time=11:24:43.106 ripples=4 ms=5 heap=125324 frames=73",
+    "Petrichor time=11:24:44.106 ripples=4 ms=5 heap=125324 frames=74",
+    "Petrichor time=11:24:45.105 ripples=4 ms=6 heap=125324 frames=75",
+    "Petrichor time=11:24:46.107 ripples=4 ms=5 heap=125324 frames=76"
+  ],
+  "limits": "Isolated emulator. Frames require visual inspection; not physical-device power/readability evidence."
+}

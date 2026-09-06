@@ -1,0 +1,397 @@
+<!doctype html>
+<!--
+  Quick Take: Rain on a puddle as a clock: three emitters drip for the hour, minute and second, and the spreading.
+  Stack: Self-contained; no external libraries.
+  Source: https://datapoems.io/clocks/petrichor/
+  License: MIT
+  Author: Luke Steuber
+-->
+<html class="collection-export embed" lang="en"><head>
+<script>window.CLOCK_COLLECTION_EXPORT=true;</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Petrichor</title>
+<meta name="description" content="Rain on a puddle as a clock: three emitters drip for the hour, minute and second, and the spreading, interfering ripples read the time by cadence and by standing rings.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-top: #0a1322; --bg: #060a14; --bg2: #040912;
+  --ink: rgba(255,255,255,.76); --dim: rgba(255,255,255,.45);
+  --faint: rgba(255,255,255,.24); --accent: #5cd9ff;
+  --accent-soft: rgba(92,217,255,.55); --glow: 0 0 16px rgba(92,217,255,.32);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; }
+body {
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, var(--bg-top), var(--bg) 46%, var(--bg2));
+  color: var(--ink);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.stage { position: fixed; inset: 0; }
+canvas { display: block; width: 100%; height: 100%; }
+.readout {
+  position: fixed; left: 0; right: 0; bottom: clamp(18px, 5vh, 44px);
+  display: flex; justify-content: center; align-items: baseline; gap: .08ch;
+  pointer-events: none; text-shadow: var(--glow);
+}
+.time {
+  color: var(--accent); font-size: clamp(25px, 6vw, 58px); font-weight: 700;
+  letter-spacing: .04em; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.sep {
+  color: var(--accent-soft); font-size: clamp(20px, 4.7vw, 44px);
+  font-weight: 700; line-height: 1; animation: blink 1s steps(1,end) infinite;
+}
+.meta {
+  color: var(--dim); font-size: clamp(7px, 1.4vw, 10px); letter-spacing: .16em;
+  margin-left: 1ch; text-transform: uppercase;
+}
+@keyframes blink { 50% { opacity: .3; } }
+.help {
+  position: fixed; top: 6px; right: 6px; z-index: 5; width: 44px; height: 44px;
+  display: grid; place-items: center; color: var(--dim); text-decoration: none;
+  font-size: 16px; font-weight: 700;
+}
+.help:hover, .help:focus { color: var(--accent); }
+.help:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+/* Featured embeds: hide chrome. Keep .readout in layout (visibility) so readoutTop geometry stays valid. */
+html.embed .readout { visibility: hidden; }
+html.embed .help { display: none; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+@media (prefers-reduced-motion: reduce) { .sep { animation: none; } }
+
+</style>
+<style>
+  canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+  .readout { mix-blend-mode: normal; }
+</style>
+<style data-collection-chrome>
+.dev-controls,
+.study-controls,
+.help,
+.back,
+.about-backdrop,
+.about-modal,
+.about-card,
+.gate-controls,
+a[aria-label*='about' i],
+button[aria-label*='about' i],
+a[aria-label*='help' i],
+button[aria-label*='help' i],
+a[aria-label*='all clocks' i],
+button[aria-label*='all clocks' i],
+a[aria-label*='clock gallery' i],
+button[aria-label*='clock gallery' i]{display:none!important}
+</style>
+</head><body class="collection-export embed">
+<main class="stage"><canvas tabindex="0" role="img" aria-label="A still reflective puddle struck by rain. Three fixed emitters drip on a tinted sky reflection — a steady drop every second, a larger splash every minute, and the rarest, biggest splash at the top of each hour — sending out concentric ripples that spread, fade and interfere. A small filled gauge of standing rings beside each emitter encodes the exact hour, minute and second. Read the time by the cadence of the splashes and by the rings; the exact time is also shown below."></canvas></main>
+<div class="readout" aria-hidden="true"><span class="time" id="h">--</span><span class="sep">:</span><span class="time" id="m">--</span><span class="sep">:</span><span class="time" id="s">--</span></div>
+<a class="help" href="https://lukesteuber.com" aria-label="Luke Steuber's website">?</a><div class="sr-only" id="sr" aria-live="polite">Loading petrichor clock.</div>
+
+
+<script>
+(function (global) {
+  'use strict';
+
+  /* Featured iframes pass ?embed=1; also detect nested frames without the flag. */
+  try {
+    var _qs = new URLSearchParams(location.search);
+    var _embed = _qs.get('embed') === '1' || _qs.get('embed') === '' || (window.self !== window.top);
+    if (_embed) document.documentElement.classList.add('embed');
+  } catch (e) {}
+
+  var PALETTES = [
+    { name: 'Bioluminescent', top: '#0a1322', bg: '#060a14', bg2: '#040912',
+      ink: 'rgba(255,255,255,.76)', dim: 'rgba(255,255,255,.45)', faint: 'rgba(255,255,255,.24)',
+      accent: '#5cd9ff', soft: 'rgba(92,217,255,.55)', rgb: [92,217,255], mark: [255,255,255] },
+    { name: 'Sodium', top: '#161006', bg: '#0a0805', bg2: '#070503',
+      ink: 'rgba(255,242,219,.76)', dim: 'rgba(255,242,219,.45)', faint: 'rgba(255,242,219,.24)',
+      accent: '#f5b441', soft: 'rgba(245,180,65,.55)', rgb: [245,180,65], mark: [255,242,219] },
+    { name: 'Neon', top: '#170a28', bg: '#0d0518', bg2: '#09030f',
+      ink: 'rgba(255,255,255,.76)', dim: 'rgba(255,255,255,.45)', faint: 'rgba(255,255,255,.24)',
+      accent: '#ff66cc', soft: 'rgba(255,102,204,.55)', rgb: [255,102,204], mark: [255,255,255] },
+    { name: 'Monochrome', top: '#111', bg: '#000', bg2: '#000',
+      ink: 'rgba(255,255,255,.78)', dim: 'rgba(255,255,255,.46)', faint: 'rgba(255,255,255,.25)',
+      accent: '#fff', soft: 'rgba(255,255,255,.55)', rgb: [255,255,255], mark: [255,255,255] },
+    { name: 'Paper', top: '#faf5e8', bg: '#f3ecda', bg2: '#e9dec4',
+      ink: 'rgba(36,22,18,.84)', dim: 'rgba(36,22,18,.56)', faint: 'rgba(36,22,18,.30)',
+      accent: '#241612', soft: 'rgba(36,22,18,.62)', rgb: [36,22,18], mark: [36,22,18] }
+  ];
+
+  function rgba(rgb, a) { return 'rgba(' + rgb.join(',') + ',' + a + ')'; }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  global.createExperimentalClock = function (options) {
+    var canvas = document.querySelector('canvas');
+    var ctx = canvas.getContext('2d');
+    var readout = document.querySelector('.readout');
+    var sr = document.getElementById('sr');
+    var key = options.key + '.palette';
+    var index = 0;
+    try { index = parseInt(localStorage.getItem(key) || '0', 10) || 0; } catch (e) {}
+    index = ((index % PALETTES.length) + PALETTES.length) % PALETTES.length;
+    var W = 1, H = 1, DPR = 1, raf = null, lastMinute = '';
+
+    function palette() { return PALETTES[index]; }
+    function applyPalette() {
+      var p = palette(), root = document.documentElement.style;
+      root.setProperty('--bg-top', p.top); root.setProperty('--bg', p.bg);
+      root.setProperty('--bg2', p.bg2); root.setProperty('--ink', p.ink);
+      root.setProperty('--dim', p.dim); root.setProperty('--faint', p.faint);
+      root.setProperty('--accent', p.accent); root.setProperty('--accent-soft', p.soft);
+      root.setProperty('--glow', '0 0 16px ' + rgba(p.rgb, .32));
+      try { localStorage.setItem(key, String(index)); } catch (e) {}
+      render(false);
+    }
+    function resize() {
+      var r = canvas.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+      DPR = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      render(false);
+    }
+    function updateReadout(now) {
+      document.getElementById('h').textContent = pad(now.getHours());
+      document.getElementById('m').textContent = pad(now.getMinutes());
+      document.getElementById('s').textContent = pad(now.getSeconds());
+      var minute = pad(now.getHours()) + ':' + pad(now.getMinutes());
+      if (minute !== lastMinute) {
+        lastMinute = minute;
+        sr.textContent = options.announce(now);
+      }
+    }
+    function render(animate) {
+      var now = new Date();
+      ctx.clearRect(0, 0, W, H);
+      options.draw({ ctx: ctx, W: W, H: H, now: now, animate: animate, palette: palette(),
+        cy: function (a) { return rgba(palette().rgb, a); },
+        mk: function (a) { return rgba(palette().mark, a); },
+        readoutTop: readout.getBoundingClientRect().top });
+      updateReadout(now);
+    }
+    function loop() { render(true); raf = requestAnimationFrame(loop); }
+    function start() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
+    }
+    function cycle() {
+      if (options.lockPalette) return;
+      index = (index + 1) % PALETTES.length;
+      applyPalette();
+    }
+
+    var down = null;
+    document.addEventListener('pointerdown', function (e) { down = [e.clientX, e.clientY, performance.now()]; });
+    document.addEventListener('pointerup', function (e) {
+      if (!down || e.target.closest('a')) return;
+      var dx = e.clientX - down[0], dy = e.clientY - down[1];
+      if (dx * dx + dy * dy < 36 && performance.now() - down[2] < 500) cycle();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key.toLowerCase() === 'p') { e.preventDefault(); cycle(); }
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+      } else if (!raf) {
+        start();
+      }
+    });
+    addEventListener('resize', resize);
+    resize(); applyPalette(); start();
+  };
+})(window);
+
+</script>
+<script>
+(function () {
+  'use strict';
+
+  // Each ripple: {ex, ey, birth, maxR, strength, speed}
+  var ripples = [];
+  var prevS = -1, prevM = -1, prevH = -1, started = false;
+  var splashFlash = [0, 0, 0]; // hour, minute, second emitter pulse 0..1
+
+  // Emitter layout fractions of the surface (x across, y down). Hour left,
+  // minute centre, second right; staggered in depth so ripples interfere.
+  var EM = [
+    { fx: 0.22, fy: 0.42, label: 'H' }, // hour
+    { fx: 0.50, fy: 0.60, label: 'M' }, // minute
+    { fx: 0.78, fy: 0.44, label: 'S' }  // second
+  ];
+
+  function emitterXY(g, i) {
+    return { x: g.W * EM[i].fx, y: g.H * EM[i].fy };
+  }
+
+  function spawn(g, i, maxR, strength, speed) {
+    var p = emitterXY(g, i);
+    ripples.push({ ex: p.x, ey: p.y, birth: performance.now(), maxR: maxR, strength: strength, speed: speed });
+    splashFlash[i] = 1;
+    // cap memory
+    if (ripples.length > 240) ripples.splice(0, ripples.length - 240);
+  }
+
+  createExperimentalClock({
+    key: 'petrichor',
+    announce: function (n) {
+      function pad(x) { return x < 10 ? '0' + x : '' + x; }
+      return 'Petrichor clock. Rain on a puddle: ' + pad(n.getHours()) + ':' + pad(n.getMinutes()) +
+             ', a drop for each passing second, a larger splash each minute, and the greatest splash on the hour.';
+    },
+    draw: function (g) {
+      var c = g.ctx, W = g.W, H = g.H, n = g.now, U = Math.min(W, H);
+      var t = performance.now();
+      var s = n.getSeconds(), m = n.getMinutes(), h = n.getHours();
+
+      // ---- detect rollovers, spawn drops ----
+      if (!started) { prevS = s; prevM = m; prevH = h; started = true; spawn(g, 2, U * 0.34, 0.9, 1.0); }
+      if (s !== prevS) { prevS = s; spawn(g, 2, U * 0.34, 0.9, 1.0); }
+      if (m !== prevM) { prevM = m; spawn(g, 1, U * 0.66, 1.5, 0.7); }
+      if (h !== prevH) { prevH = h; spawn(g, 0, U * 1.05, 2.2, 0.5); }
+
+      // ---- reflective surface: a tinted vertical sky gradient ----
+      var sky = c.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0.00, g.cy(0.015));
+      sky.addColorStop(0.45, g.cy(0.05));
+      sky.addColorStop(0.72, g.cy(0.11));
+      sky.addColorStop(1.00, g.cy(0.20));
+      c.fillStyle = sky;
+      c.fillRect(0, 0, W, H);
+      // dark water bed beneath the tint so the surface reads as deep
+      c.fillStyle = g.mk(0.02);
+      c.fillRect(0, 0, W, H);
+
+      // ---- ripples: drawn as additive light/dark concentric bands ----
+      // A wave field: each ripple is a few concentric crests that travel out.
+      c.save();
+      c.globalCompositeOperation = 'lighter';
+      var alive = [];
+      for (var i = 0; i < ripples.length; i++) {
+        var rp = ripples[i];
+        var age = (t - rp.birth) / 1000;
+        var life = 3.2 / rp.speed; // longer-lived for slower, bigger splashes
+        if (age > life) continue;
+        alive.push(rp);
+        var prog = age / life;
+        var lead = rp.maxR * Math.min(1, prog * 1.15);
+        var fade = (1 - prog);
+        fade = fade * fade;
+        // three crest rings trailing the leading edge (interference texture)
+        for (var k = 0; k < 3; k++) {
+          var rr = lead - k * (U * 0.05 + rp.maxR * 0.04);
+          if (rr <= 1) continue;
+          var bandA = fade * rp.strength * (0.10 - k * 0.025);
+          if (bandA <= 0.002) continue;
+          c.beginPath();
+          c.arc(rp.ex, rp.ey, rr, 0, Math.PI * 2);
+          c.strokeStyle = g.cy(bandA);
+          c.lineWidth = Math.max(1, U * 0.012 * (1 - k * 0.25));
+          c.stroke();
+        }
+        // bright impact core flash early in life
+        if (prog < 0.18) {
+          var fa = (0.18 - prog) / 0.18;
+          c.beginPath();
+          c.arc(rp.ex, rp.ey, U * 0.02 * fa + 2, 0, Math.PI * 2);
+          c.fillStyle = g.cy(0.5 * fa * rp.strength);
+          c.fill();
+        }
+      }
+      ripples = alive;
+      c.restore();
+
+      // ---- trough darkening pass: subtract a faint dark ring just inside each crest
+      // to fake refraction (the surface dips before each rising wave) ----
+      c.save();
+      c.globalCompositeOperation = 'source-over';
+      for (var j = 0; j < ripples.length; j++) {
+        var r2 = ripples[j];
+        var a2 = (t - r2.birth) / 1000;
+        var life2 = 3.2 / r2.speed;
+        var pr2 = a2 / life2;
+        var lead2 = r2.maxR * Math.min(1, pr2 * 1.15);
+        var trough = lead2 - U * 0.024;
+        if (trough <= 1) continue;
+        var fa2 = (1 - pr2); fa2 = fa2 * fa2;
+        c.beginPath();
+        c.arc(r2.ex, r2.ey, trough, 0, Math.PI * 2);
+        c.strokeStyle = g.mk(0.06 * fa2 * r2.strength);
+        c.lineWidth = Math.max(1, U * 0.01);
+        c.stroke();
+      }
+      c.restore();
+
+      // ---- emitters + standing-ring gauges ----
+      var counts = [h, m, s];
+      var totals = [24, 60, 60];
+      for (var e = 0; e < 3; e++) {
+        var p = emitterXY(g, e);
+        // decay the splash flash
+        splashFlash[e] *= 0.90;
+        var flash = splashFlash[e];
+
+        // standing concentric gauge: filled rings = current value, faint = remaining
+        var maxRings = (e === 0) ? 12 : 12; // bounded count of visible rings
+        var val = counts[e], tot = totals[e];
+        var ringStep = Math.max(3.5, U * 0.013);
+        var baseR = Math.max(4, U * 0.014);
+        for (var ri = 0; ri < maxRings; ri++) {
+          var thisR = baseR + ri * ringStep;
+          // proportion of this ring's slice that's filled
+          var lo = ri / maxRings, hi = (ri + 1) / maxRings;
+          var frac = val / tot;
+          var fillA;
+          if (frac >= hi) fillA = 1;
+          else if (frac <= lo) fillA = 0;
+          else fillA = (frac - lo) / (hi - lo);
+          c.beginPath();
+          c.arc(p.x, p.y, thisR, 0, Math.PI * 2);
+          c.strokeStyle = g.cy(0.06 + 0.5 * fillA);
+          c.lineWidth = fillA > 0.02 ? Math.max(1.2, U * 0.005) : 1;
+          c.stroke();
+        }
+
+        // emitter drip head: a small bright bead that bulges on splash
+        c.save();
+        c.shadowColor = g.palette.accent;
+        c.shadowBlur = (4 + flash * 18);
+        c.beginPath();
+        c.arc(p.x, p.y, baseR * (0.62 + flash * 0.9), 0, Math.PI * 2);
+        c.fillStyle = g.cy(0.7 + 0.3 * flash);
+        c.fill();
+        c.restore();
+
+        // label letter (H/M/S) just above the gauge
+        c.save();
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.font = '700 ' + Math.max(9, U * 0.022) + 'px "JetBrains Mono"';
+        c.fillStyle = g.cy(0.35 + 0.4 * flash);
+        c.fillText(EM[e].label, p.x, p.y - baseR - maxRings * ringStep - U * 0.028);
+        // value beneath
+        c.font = '700 ' + Math.max(8, U * 0.016) + 'px "JetBrains Mono"';
+        c.fillStyle = g.cy(0.28);
+        var lbl = (val < 10 ? '0' + val : '' + val);
+        c.fillText(lbl, p.x, p.y + baseR + maxRings * ringStep + U * 0.026);
+        c.restore();
+      }
+
+      // ---- faint surface vignette to seat the puddle in the frame ----
+      var vg = c.createRadialGradient(W / 2, H / 2, U * 0.3, W / 2, H / 2, Math.hypot(W, H) * 0.6);
+      vg.addColorStop(0, g.mk(0));
+      vg.addColorStop(1, g.mk(0.18));
+      c.fillStyle = vg;
+      c.fillRect(0, 0, W, H);
+    }
+  });
+})();
+</script>
+
+</body></html>

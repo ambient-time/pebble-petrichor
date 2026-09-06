@@ -1,0 +1,171 @@
+{
+  "version": "1.0.0",
+  "pbwSHA256": "4c656f5feaab9e369eb2acad40b5b1e8dd151ebc7af41e6d8dc106c5b932c1c4",
+  "platforms": {
+    "basalt": {
+      "capturedAt": "2026-09-06T07:09:28.979918+00:00",
+      "loggedRenderMS": {
+        "min": 39,
+        "max": 55
+      },
+      "minimumLoggedFreeHeapBytes": 59708,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          23,
+          31,
+          39
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    },
+    "chalk": {
+      "capturedAt": "2026-09-06T07:08:45.120383+00:00",
+      "loggedRenderMS": {
+        "min": 42,
+        "max": 54
+      },
+      "minimumLoggedFreeHeapBytes": 59708,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          23,
+          31,
+          39
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    },
+    "diorite": {
+      "capturedAt": "2026-09-06T07:07:37.081284+00:00",
+      "loggedRenderMS": {
+        "min": 0,
+        "max": 16
+      },
+      "minimumLoggedFreeHeapBytes": 59452,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          24,
+          32,
+          40
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    },
+    "emery": {
+      "capturedAt": "2026-09-06T07:10:12.889074+00:00",
+      "loggedRenderMS": {
+        "min": 4,
+        "max": 7
+      },
+      "minimumLoggedFreeHeapBytes": 125244,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          23,
+          31,
+          39
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    },
+    "flint": {
+      "capturedAt": "2026-09-06T07:12:20.137333+00:00",
+      "loggedRenderMS": {
+        "min": 2,
+        "max": 13
+      },
+      "minimumLoggedFreeHeapBytes": 59452,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          22,
+          29,
+          37,
+          45
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    },
+    "gabbro": {
+      "capturedAt": "2026-09-06T07:13:04.200617+00:00",
+      "loggedRenderMS": {
+        "min": 5,
+        "max": 8
+      },
+      "minimumLoggedFreeHeapBytes": 125244,
+      "naturalNoonRollover": true,
+      "naturalMidnightRollover": true,
+      "cadenceFrames": {
+        "idle": [
+          19,
+          20,
+          21
+        ],
+        "tap": [
+          22,
+          29,
+          37,
+          45
+        ],
+        "settled": [
+          74,
+          75,
+          76
+        ]
+      }
+    }
+  },
+  "limits": "Production PBW tested in isolated native emulators. Physical-watch battery/readability and CloudPebble build are separate checks; see the publication record for store state."
+}

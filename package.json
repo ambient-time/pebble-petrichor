@@ -1,0 +1,39 @@
+{
+  "name": "petrichor",
+  "author": "Luke Steuber",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Petrichor",
+    "companyName": "Luke Steuber",
+    "uuid": "4150a96f-88c8-48cd-ad81-74a1fc34c8c7",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "menu-icon.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  }
+}
