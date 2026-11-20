@@ -31,7 +31,3 @@ animation shows the intermediate spreading motion.
 It compares every application byte apart from the SDK header CRC, resource
 timestamp, and validated GNU build ID, and checks resource packs for exact
 agreement. This proof stays outside the ZIP whose hash it records.
-
-Private mirror, CloudPebble build, dashboard upload, and public listing status
-belong in the release record. These native checks establish none of those
-publication steps.
